@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+#===========================================================
+# CMakeLists.txt for cv_flip
+#===========================================================
+
+# 共通モジュール設定
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
+include(common)
+
+# ツール名
+set(PROJ_NAME "cv_flip")
+
+# OpenCVライブラリ
+set(OPENCV_LIBS "core" "imgproc" "highgui")
+
+#===========================================================
+
+# ツール共通設定
+setup_cvtool()
+
+#===========================================================
+# EOF
