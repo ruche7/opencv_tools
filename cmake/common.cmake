@@ -14,7 +14,7 @@ set(EXTRA_EXTENDS "h;hpp;hxx;inc;def")
 
 # コンパイラに追加設定するオプション
 if(MSVC)
-    set(ADDITIONAL_COMPILE_FLAGS "/MP /W4 /WX")
+    set(ADDITIONAL_COMPILE_FLAGS "/MP /W4 /WX /wd4505")
     set(ADDITIONAL_COMPILE_FLAGS_RELEASE "/Ox /Og /Oi /Ot /Oy")
 else()
     set(ADDITIONAL_COMPILE_FLAGS "")
