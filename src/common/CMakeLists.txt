@@ -13,16 +13,8 @@ set(PROJ_NAME "common")
 # ライブラリ種別
 set(PROJ_TYPE "static")
 
-# ベースディレクトリパス
-set(PROJ_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-
-# ソースディレクトリ
-set(PROJ_SRC_DIRS
-    "src"
-    "src/utility"
-    "include"
-    "include/cvtool"
-    "include/cvtool/utility")
+# ソースのルートディレクトリパス
+set(PROJ_SRC_DIRS "src" "include")
 
 # インクルードパス
 set(PROJ_INCLUDES "include" "src/include")

@@ -45,19 +45,28 @@ endmacro()
 # 
 # 事前に以下の変数の設定が必要。
 #  - PROJ_NAME     -- プロジェクト名
-#  - PROJ_TYPE     -- プロジェクトの種別
-#  - PROJ_BASE_DIR -- プロジェクトのルートディレクトリパス
-#  - PROJ_SRC_DIRS -- ソースディレクトリパスのリスト
+#  - PROJ_SRC_DIRS -- ソースのルートディレクトリパスのリスト
 #  - PROJ_INCLUDES -- インクルードパスのリスト
 #
+# 以下の変数は未設定ならば既定値が設定される。
+#  - PROJ_TYPE     -- プロジェクトの種別
+#  - PROJ_BASE_DIR -- プロジェクトのルートディレクトリパス
+#
 # PROJ_TYPE には下記のいずれかの値を指定する。
-# 
 #  - "program" -- 実行プログラム(既定値)
 #  - "static"  -- スタティックライブラリ
 #  - "shared"  -- 共有ライブラリ(DLL)
 #---------------------------------------
 macro(setup_common)
     message("---- setup : ${PROJ_NAME}")
+
+    # 必要な変数を設定
+    if(NOT PROJ_TYPE)
+        set(PROJ_TYPE "program")
+    endif()
+    if(NOT PROJ_BASE_DIR)
+        set(PROJ_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    endif()
 
     # ビルド構成設定
     setup_config_types()
@@ -73,7 +82,7 @@ macro(setup_common)
 
         # ソース以外のファイルを先に追加
         foreach(EXTRA_EXT ${EXTRA_EXTENDS})
-            file(GLOB TEMP_SRC_FILES
+            file(GLOB_RECURSE TEMP_SRC_FILES
                 "${PROJ_BASE_DIR}/${SRC_DIR}/*.${EXTRA_EXT}")
             list(APPEND FILES_ON_DIR ${TEMP_SRC_FILES})
         endforeach()
@@ -83,21 +92,26 @@ macro(setup_common)
 
         # ソースファイルを追加
         foreach(SRC_EXT ${SRC_EXTENDS})
-            file(GLOB TEMP_SRC_FILES
+            file(GLOB_RECURSE TEMP_SRC_FILES
                 "${PROJ_BASE_DIR}/${SRC_DIR}/*.${SRC_EXT}")
             list(APPEND FILES_ON_DIR ${TEMP_SRC_FILES})
         endforeach()
-
-        # ファイルの属するプロジェクト階層を設定(VC++用)
-        string(REPLACE "/" "\\" PROJ_DIR "${SRC_DIR}")
-        source_group("${PROJ_DIR}" FILES ${FILES_ON_DIR})
 
         # ファイルリストに追加
         list(APPEND SRC_FILES ${FILES_ON_DIR})
     endforeach()
 
-    # ソースファイル名出力
+    # 全ファイルに対する処理
     foreach(SRC_FILE ${SRC_FILES})
+        # ディレクトリの相対パス取得
+        file(RELATIVE_PATH REL_PATH "${PROJ_BASE_DIR}" "${SRC_FILE}")
+        string(REGEX REPLACE "/[^/]+$" "" REL_PATH "${REL_PATH}")
+
+        # ファイルの属するプロジェクト階層を設定(主にVC++用)
+        string(REPLACE "/" "\\" PROJ_TREE "${REL_PATH}")
+        source_group("${PROJ_TREE}" FILES "${SRC_FILE}")
+
+        # ソースファイル名出力
         message("INPUT: ${SRC_FILE}")
     endforeach()
 
@@ -133,21 +147,18 @@ endmacro()
 # ツール作成の共通設定を行う。
 # 
 # 事前に以下の変数の設定が必要。
-#  - PROJ_NAME      -- プロジェクト名
-#  - OPENCV_LIBS    -- リンクするOpenCVライブラリ名リスト
+#  - PROJ_NAME   -- プロジェクト名
+#  - OPENCV_LIBS -- リンクするOpenCVライブラリ名リスト
 #
 # 以下の変数は未設定ならば既定値が設定される。
 #  - PROJ_BASE_DIR  -- プロジェクトのルートディレクトリパス
-#  - PROJ_SRC_DIRS  -- ソースディレクトリパスのリスト
+#  - PROJ_SRC_DIRS  -- ソースのルートディレクトリパスのリスト
 #  - PROJ_INCLUDES  -- インクルードパスのリスト
 #  - OPENCV_VERSION -- OpenCVライブラリバージョン値 (ex. "248")
 #---------------------------------------
 macro(setup_cvtool)
     # 必要な変数を設定
     set(PROJ_TYPE "program")
-    if(NOT PROJ_BASE_DIR)
-        set(PROJ_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    endif()
     if(NOT PROJ_SRC_DIRS)
         set(PROJ_SRC_DIRS "src")
     endif()
