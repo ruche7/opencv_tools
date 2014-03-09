@@ -17,7 +17,12 @@ set(PROJ_TYPE "static")
 set(PROJ_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # ソースディレクトリ
-set(PROJ_SRC_DIRS "src" "include" "include/cvtool")
+set(PROJ_SRC_DIRS
+    "src"
+    "src/utility"
+    "include"
+    "include/cvtool"
+    "include/cvtool/utility")
 
 # インクルードパス
 set(PROJ_INCLUDES "include" "src/include")

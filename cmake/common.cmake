@@ -14,12 +14,16 @@ set(EXTRA_EXTENDS "h;hpp;hxx;inc;def")
 
 # コンパイラに追加設定するオプション
 if(MSVC)
-    set(ADDITIONAL_COMPILE_FLAGS "/MP /W4 /WX /wd4505")
+    # boost のコードで出てしまうW4警告は無視
+    set(ADDITIONAL_COMPILE_FLAGS "/MP /W4 /WX /wd4505 /wd4512")
     set(ADDITIONAL_COMPILE_FLAGS_RELEASE "/Ox /Og /Oi /Ot /Oy")
 else()
     set(ADDITIONAL_COMPILE_FLAGS "")
     set(ADDITIONAL_COMPILE_FLAGS_RELEASE "")
 endif()
+
+# OpenCVライブラリバージョン既定値
+set(OPENCV_VERSION_DEFAULT "248")
 
 #---------------------------------------
 # 変数名とその内容を表示する。
@@ -129,13 +133,14 @@ endmacro()
 # ツール作成の共通設定を行う。
 # 
 # 事前に以下の変数の設定が必要。
-#  - PROJ_NAME     -- プロジェクト名
-#  - OPENCV_LIBS   -- リンクするOpenCVライブラリ名リスト
+#  - PROJ_NAME      -- プロジェクト名
+#  - OPENCV_LIBS    -- リンクするOpenCVライブラリ名リスト
 #
 # 以下の変数は未設定ならば既定値が設定される。
-#  - PROJ_BASE_DIR -- プロジェクトのルートディレクトリパス
-#  - PROJ_SRC_DIRS -- ソースディレクトリパスのリスト
-#  - PROJ_INCLUDES -- インクルードパスのリスト
+#  - PROJ_BASE_DIR  -- プロジェクトのルートディレクトリパス
+#  - PROJ_SRC_DIRS  -- ソースディレクトリパスのリスト
+#  - PROJ_INCLUDES  -- インクルードパスのリスト
+#  - OPENCV_VERSION -- OpenCVライブラリバージョン値 (ex. "248")
 #---------------------------------------
 macro(setup_cvtool)
     # 必要な変数を設定
@@ -149,6 +154,9 @@ macro(setup_cvtool)
     if(NOT PROJ_INCLUDES)
         set(PROJ_INCLUDES "../common/include")
     endif()
+    if(NOT OPENCV_VERSION)
+        set(OPENCV_VERSION "${OPENCV_VERSION_DEFAULT}")
+    endif()
 
     # 共通設定
     setup_common()
@@ -156,7 +164,7 @@ macro(setup_cvtool)
     # OpenCVライブラリをリンク
     foreach(CVLIB ${OPENCV_LIBS})
         # 完全名作成
-        set(CVLIB_NAME "opencv_${CVLIB}")
+        set(CVLIB_NAME "opencv_${CVLIB}${OPENCV_VERSION}")
         message("LINK: ${CVLIB_NAME}")
 
         # リンクライブラリ追加
@@ -164,8 +172,8 @@ macro(setup_cvtool)
         target_link_libraries("${PROJ_NAME}" optimized "${CVLIB_NAME}")
     endforeach()
 
-    # common ライブラリを依存プロジェクトにする
-    add_dependencies("${PROJ_NAME}" "common")
+    # common ライブラリを依存プロジェクト＆リンクライブラリに追加
+    target_link_libraries("${PROJ_NAME}" "common")
 
     # インストール設定
     install(TARGETS "${PROJ_NAME}" DESTINATION "${PROJ_BASE_DIR}/../../bin")

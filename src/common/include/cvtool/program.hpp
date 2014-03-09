@@ -7,9 +7,9 @@
 #include <cvtool/program_arg.hpp>
 
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
+#include <algorithm>
+#include <vector>
 #include <string>
-#include <exception>
 #include <ostream>
 
 namespace cvtool
@@ -41,10 +41,12 @@ namespace cvtool
             argv_(argv),
             positional_arg_name_(
                 (positional_arg_name == nullptr) ? "" : positional_arg_name),
-            positional_arg_count_(positional_arg_count),
+            positional_arg_count_(
+                (positional_arg_count < 0) ? -1 : positional_arg_count),
             program_name_(make_program_name(argc, argv)),
             desc_("Option"),
-            vm_()
+            help_required_(false),
+            positional_store_()
         {
             make_options(desc_, arg_defs...);
         }
@@ -93,6 +95,19 @@ namespace cvtool
         /// @return 指定文字列値。 index が範囲外ならば nullptr 。
         const char* parsed_positional_arg(std::size_t index) const;
 
+        /// @brief
+        ///     オプション名を伴わないプログラム引数の指定文字列値に対する処理を行う。
+        /// @tparam F 処理関数型。
+        /// @param[in] func 処理関数。
+        template<class F>
+        void for_each_parsed_positional_args(F func) const
+        {
+            if (allow_positional())
+            {
+                std::for_each(positional_store_.begin(), positional_store_.end(), func);
+            }
+        }
+
         /// @brief ヘルプ表示を要求されたか否かを取得する。
         /// @return true  ヘルプ表示を要求された場合。
         /// @return false ヘルプ表示を要求されなかった場合。
@@ -100,40 +115,40 @@ namespace cvtool
         /// parse_args 関数呼び出し前は必ず false を返す。
         bool help_required() const;
 
-        /// @brief ヘルプ出力を行う。
+        /// @brief 引数指定方法出力を行う。
+        /// @note print_usage(std::cout) と同義。
+        void print_usage() const;
+
+        /// @brief 引数指定方法出力を行う。
+        /// @param[in,out] s 出力先ストリーム。
+        void print_usage(std::ostream& s) const;
+
+        /// @brief ヘルプ出力を行う。引数指定方法出力も含む。
         /// @note print_help(std::cout) と同義。
         void print_help() const;
 
-        /// @brief ヘルプ出力を行う。
+        /// @brief ヘルプ出力を行う。引数指定方法出力も含む。
         /// @param[in,out] s 出力先ストリーム。
         void print_help(std::ostream& s) const;
 
-        /// @brief エラー出力を行う。
-        /// @param[in] ex エラー原因の例外値。
-        /// @note print_help(std::cerr, ex) と同義。
-        void print_error(const std::exception& ex) const;
-
-        /// @brief エラー出力を行う。
-        /// @param[in,out] s 出力先ストリーム。
-        /// @param[in] ex エラー原因の例外値。
-        void print_error(std::ostream& s, const std::exception& ex) const;
-
     private:
+        /// 引数指定方法文字列を作成する。
         std::string make_usage() const;
 
-        static std::string make_program_name(int argc, const char* const argv[]);
+        /// オプション定義を作成する。
+        void make_options(boost::program_options::options_description& desc);
 
-        static void make_options(boost::program_options::options_description& desc);
-
+        /// オプション定義を作成する。
         template<class ...TArgs>
-        static void make_options(
+        void make_options(
             boost::program_options::options_description& desc,
             const program_arg<TArgs>&... arg_defs)
         {
             make_options(desc);
-            add_options(desc, arg_defs...);
+            add_to_options(desc, arg_defs...);
         }
 
+        /// プログラム引数定義をオプション定義に追加する。
         template<class T>
         static void add_to_options(
             boost::program_options::options_description& desc,
@@ -142,6 +157,7 @@ namespace cvtool
             arg_def.add_to(desc);
         }
 
+        /// プログラム引数定義をオプション定義に追加する。
         template<class T, class ...TArgs>
         static void add_to_options(
             boost::program_options::options_description& desc,
@@ -152,6 +168,9 @@ namespace cvtool
             add_to_options(desc, arg_defs...);
         }
 
+        /// プログラム引数を基にプログラム名を作成する。
+        static std::string make_program_name(int argc, const char* const argv[]);
+
     private:
         int argc_;
         const char* const* argv_;
@@ -160,6 +179,7 @@ namespace cvtool
 
         std::string program_name_;
         boost::program_options::options_description desc_;
-        boost::program_options::variables_map vm_;
+        bool help_required_;
+        std::vector<std::string> positional_store_;
     };
 }
