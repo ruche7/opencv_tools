@@ -62,9 +62,6 @@ macro(setup_common)
     # ビルド構成設定
     setup_config_types()
 
-    # サフィックス設定
-    set(CMAKE_DEBUG_POSTFIX "_d")
-
     # プロジェクト設定
     project("${PROJ_NAME}")
 
@@ -112,6 +109,9 @@ macro(setup_common)
     else()
         add_executable("${PROJ_NAME}" ${SRC_FILES})
     endif()
+
+    # デバッグ版のポストフィックス設定
+    set_target_properties("${PROJ_NAME}" PROPERTIES DEBUG_POSTFIX "_d")
 
     # インクルードパス追加
     foreach(INC_PATH ${PROJ_INCLUDES})
