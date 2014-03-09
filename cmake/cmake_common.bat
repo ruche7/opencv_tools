@@ -1,3 +1,4 @@
+@setlocal
 @echo off
 set RET=1
 REM --------------------------------------------------------
@@ -39,19 +40,18 @@ set OUTPUT_DIR=%ROOT_DIR%\%OUTPUT_DIR_NAME%
 if not exist "%OUTPUT_DIR%" ( mkdir "%OUTPUT_DIR%" )
 
 REM ---- output variables
-echo GENERATOR : %GENERATOR%
-echo EXTRA_ARGS: %EXTRA_ARGS%
-echo OUTPUT_DIR: %OUTPUT_DIR_NAME%
+echo GENERATOR  : %GENERATOR%
+echo EXTRA_ARGS : %EXTRA_ARGS%
+echo OUTPUT_DIR : %OUTPUT_DIR_NAME%
 echo.
 
 REM ---- execute cmake
-set CURDIR=%CD%
-cd "%OUTPUT_DIR%"
+pushd "%OUTPUT_DIR%"
 cmake %EXTRA_ARGS% -G "%GENERATOR%" --build "%CMAKE_DIR%"
 set RET=%ERRORLEVEL%
-cd "%CURDIR%"
+popd
+if not "%RET%"=="0" pause
 
 REM --------------------------------------------------------
 
-if not "%RET%"=="0" pause
 exit /b "%RET%"

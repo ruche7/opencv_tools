@@ -58,7 +58,7 @@ endmacro()
 #  - "shared"  -- 共有ライブラリ(DLL)
 #---------------------------------------
 macro(setup_common)
-    message("---- setup : ${PROJ_NAME}")
+    message("-- setup : ${PROJ_NAME}")
 
     # 必要な変数を設定
     if(NOT PROJ_TYPE)
