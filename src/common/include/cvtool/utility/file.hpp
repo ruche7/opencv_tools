@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <cvtool/program_arg.hpp>
+
 #include <string>
 
 namespace cvtool { namespace utility
@@ -48,11 +50,19 @@ namespace cvtool { namespace utility
         const std::string& prefix,
         const std::string& suffix);
 
-    /// @brief ファイル名プレフィクス置換用プログラム引数の説明文を取得する。
-    /// @return 説明文。
-    std::string filename_prefix_arg_description();
+    /// @brief ファイル名プレフィクス置換用のプログラム引数を作成する。
+    /// @param[in] name 引数名。カンマで区切って短縮名も指定できる。
+    /// @param[in] store プレフィクス文字列の設定先。
+    /// @return プログラム引数。
+    program_arg<std::string> make_filename_prefix_program_arg(
+        const std::string& name,
+        std::string& store);
 
-    /// @brief ファイル名サフィックス置換用プログラム引数の説明文を取得する。
-    /// @return 説明文。
-    std::string filename_suffix_arg_description();
+    /// @brief ファイル名サフィックス置換用のプログラム引数を作成する。
+    /// @param[in] name 引数名。カンマで区切って短縮名も指定できる。
+    /// @param[in] store サフィックス文字列の設定先。
+    /// @return プログラム引数。
+    program_arg<std::string> make_filename_suffix_program_arg(
+        const std::string& name,
+        std::string& store);
 }}

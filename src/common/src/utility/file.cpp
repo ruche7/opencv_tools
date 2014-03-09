@@ -91,19 +91,29 @@ namespace cvtool { namespace utility
                 change_filepath_prefix(fpath, prefix), suffix).string();
     }
 
-    std::string filename_prefix_arg_description()
+    program_arg<std::string> make_filename_prefix_program_arg(
+        const std::string& name,
+        std::string& store)
     {
         return
-            "Change the prefix of file names. "
-            "If value contained directory path, directory pathes are replaced. "
-            "Otherwise, directory pathes are kept.";
+            make_program_arg(
+                name,
+                "Change the prefix of file names. "
+                "If value contained directory path, directory pathes are replaced. "
+                "Otherwise, directory pathes are kept.",
+                store);
     }
 
-    std::string filename_suffix_arg_description()
+    program_arg<std::string> make_filename_suffix_program_arg(
+        const std::string& name,
+        std::string& store)
     {
         return
-            "Change the suffix of file names. "
-            "If value contained extension, file extensions are replaced. "
-            "Otherwise, file extensions are kept.";
+            make_program_arg(
+                name,
+                "Change the suffix of file names. "
+                "If value contained extension, file extensions are replaced. "
+                "Otherwise, file extensions are kept.",
+                store);
     }
 }}

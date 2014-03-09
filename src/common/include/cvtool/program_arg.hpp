@@ -6,6 +6,7 @@
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
+#include <utility>
 #include <string>
 
 namespace cvtool
@@ -39,7 +40,28 @@ namespace cvtool
         program_arg(const program_arg&) = default;
         ~program_arg() = default;
         program_arg& operator=(const program_arg&) = default;
-#ifndef _MSC_VER
+
+#ifdef _MSC_VER
+        /// ムーブコンストラクタ。
+        program_arg(program_arg&& src)
+            :
+            name_(std::move(src.name_)),
+            description_(std::move(src.description_)),
+            store_(src.store_),
+            required_(src.required_)
+        {
+        }
+
+        /// ムーブ代入演算子。
+        program_arg& operator=(program_arg&& r)
+        {
+            name_ = std::move(r.name_);
+            description_ = std::move(r.description_);
+            store_ = r.store_;
+            required_ = r.required_;
+        }
+#else
+        // 既定動作
         program_arg(program_arg&&) = default;
         program_arg& operator=(program_arg&&) = default;
 #endif // _MSC_VER
@@ -87,7 +109,26 @@ namespace cvtool
         program_arg(const program_arg&) = default;
         ~program_arg() = default;
         program_arg& operator=(const program_arg&) = default;
-#ifndef _MSC_VER
+
+#ifdef _MSC_VER
+        /// ムーブコンストラクタ。
+        program_arg(program_arg&& src)
+            :
+            name_(std::move(src.name_)),
+            description_(std::move(src.description_)),
+            presented_store_(src.presented_store_)
+        {
+        }
+
+        /// ムーブ代入演算子。
+        program_arg& operator=(program_arg&& r)
+        {
+            name_ = std::move(r.name_);
+            description_ = std::move(r.description_);
+            presented_store_ = r.presented_store_;
+        }
+#else
+        // 既定動作
         program_arg(program_arg&&) = default;
         program_arg& operator=(program_arg&&) = default;
 #endif // _MSC_VER
@@ -113,6 +154,7 @@ namespace cvtool
     /// @param[in] description 説明文。
     /// @param[in] store 引数値設定先参照。既定値にもなる。
     /// @param[in] required 必ず指定すべき引数ならば true 。
+    /// @return プログラム引数。
     ///
     /// required が true ならば store は既定値にはならない。
     template<class T>
@@ -129,6 +171,7 @@ namespace cvtool
     /// @param[in] name 引数名。カンマで区切って短縮名も指定できる。
     /// @param[in] description 説明文。
     /// @param[in] presented_store 引数が指定されたか否かの設定先。
+    /// @return プログラム引数。
     inline program_arg<void> make_switch_program_arg( 
         const std::string& name,
         const std::string& description,

@@ -16,7 +16,7 @@ set(EXTRA_EXTENDS "h;hpp;hxx;inc;def")
 if(MSVC)
     # boost のコードで出てしまうW4警告は無視
     set(ADDITIONAL_COMPILE_FLAGS "/MP /W4 /WX /wd4505 /wd4512")
-    set(ADDITIONAL_COMPILE_FLAGS_RELEASE "/Ox /Og /Oi /Ot /Oy")
+    set(ADDITIONAL_COMPILE_FLAGS_RELEASE "/Ox /Oi /Ot /Oy")
 else()
     set(ADDITIONAL_COMPILE_FLAGS "")
     set(ADDITIONAL_COMPILE_FLAGS_RELEASE "")

@@ -82,13 +82,11 @@ int main(int argc, char* argv[])
         argv,
         "files...",
         -1,
-        cvtool::make_program_arg(
-            "prefix,p",
-            cvtool::utility::filename_prefix_arg_description(),
+        cvtool::utility::make_filename_prefix_program_arg(
+            "file-prefix,P",
             store.prefix),
-        cvtool::make_program_arg(
-            "suffix,s",
-            cvtool::utility::filename_suffix_arg_description(),
+        cvtool::utility::make_filename_suffix_program_arg(
+            "file-suffix,S",
             store.suffix),
         cvtool::make_switch_program_arg(
             "horz,h",
