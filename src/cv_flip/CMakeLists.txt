@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 
 # 共通モジュール設定
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake")
-include(common)
+include(cvtool)
 
 # ツール名
 set(PROJ_NAME "cv_flip")
@@ -16,7 +16,9 @@ set(OPENCV_LIBS "core" "imgproc" "highgui")
 #===========================================================
 
 # ツール共通設定
+message("-- setup : ${PROJ_NAME}")
 setup_cvtool()
+message("-- setup end")
 
 #===========================================================
 # EOF

@@ -58,8 +58,6 @@ endmacro()
 #  - "shared"  -- 共有ライブラリ(DLL)
 #---------------------------------------
 macro(setup_common)
-    message("-- setup : ${PROJ_NAME}")
-
     # 必要な変数を設定
     if(NOT PROJ_TYPE)
         set(PROJ_TYPE "program")
@@ -141,53 +139,6 @@ macro(setup_common)
         "${CMAKE_C_FLAGS} ${ADDITIONAL_COMPILE_FLAGS}")
     set(CMAKE_C_FLAGS_RELEASE
         "${CMAKE_C_FLAGS_RELEASE} ${ADDITIONAL_COMPILE_FLAGS_RELEASE}")
-endmacro()
-
-#---------------------------------------
-# ツール作成の共通設定を行う。
-# 
-# 事前に以下の変数の設定が必要。
-#  - PROJ_NAME   -- プロジェクト名
-#  - OPENCV_LIBS -- リンクするOpenCVライブラリ名リスト
-#
-# 以下の変数は未設定ならば既定値が設定される。
-#  - PROJ_BASE_DIR  -- プロジェクトのルートディレクトリパス
-#  - PROJ_SRC_DIRS  -- ソースのルートディレクトリパスのリスト
-#  - PROJ_INCLUDES  -- インクルードパスのリスト
-#  - OPENCV_VERSION -- OpenCVライブラリバージョン値 (ex. "248")
-#---------------------------------------
-macro(setup_cvtool)
-    # 必要な変数を設定
-    set(PROJ_TYPE "program")
-    if(NOT PROJ_SRC_DIRS)
-        set(PROJ_SRC_DIRS "src")
-    endif()
-    if(NOT PROJ_INCLUDES)
-        set(PROJ_INCLUDES "../common/include")
-    endif()
-    if(NOT OPENCV_VERSION)
-        set(OPENCV_VERSION "${OPENCV_VERSION_DEFAULT}")
-    endif()
-
-    # 共通設定
-    setup_common()
-
-    # OpenCVライブラリをリンク
-    foreach(CVLIB ${OPENCV_LIBS})
-        # 完全名作成
-        set(CVLIB_NAME "opencv_${CVLIB}${OPENCV_VERSION}")
-        message("LINK: ${CVLIB_NAME}")
-
-        # リンクライブラリ追加
-        target_link_libraries("${PROJ_NAME}" debug     "${CVLIB_NAME}d")
-        target_link_libraries("${PROJ_NAME}" optimized "${CVLIB_NAME}")
-    endforeach()
-
-    # common ライブラリを依存プロジェクト＆リンクライブラリに追加
-    target_link_libraries("${PROJ_NAME}" "common")
-
-    # インストール設定
-    install(TARGETS "${PROJ_NAME}" DESTINATION "${PROJ_BASE_DIR}/../../bin")
 endmacro()
 
 #===========================================================

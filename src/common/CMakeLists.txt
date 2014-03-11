@@ -22,7 +22,9 @@ set(PROJ_INCLUDES "include" "src/include")
 #===========================================================
 
 # ã§í ê›íË
+message("-- setup : ${PROJ_NAME}")
 setup_common()
+message("-- setup end")
 
 #===========================================================
 # EOF
