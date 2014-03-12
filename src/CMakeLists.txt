@@ -22,6 +22,7 @@ add_subdirectory("common")
 
 # ƒc[ƒ‹ŒQ’Ç‰Á
 add_subdirectory("cv_flip")
+add_subdirectory("cv_rename")
 
 #===========================================================
 # EOF

@@ -5,6 +5,7 @@
 #include <cvtool/program.hpp>
 #include <cvtool/utility/error.hpp>
 #include <cvtool/utility/file.hpp>
+#include <cvtool/utility/image.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -31,10 +32,10 @@ namespace
         cout << "INPUT  : " << file << endl;
 
         // ファイル読み込み
-        cv::Mat src_img = cv::imread(file, -1);
+        cv::Mat src_img = cvtool::image::read(file, -1);
         if (src_img.empty())
         {
-            cvtool::utility::print_error("Cannot read image file '" + file + "'.");
+            cvtool::error::prints("Cannot read image file '", file, "'.");
             return false;
         }
 
@@ -50,22 +51,21 @@ namespace
 
         // 出力ファイルパス作成
         const std::string outfile =
-            cvtool::utility::change_filename(file, store.prefix, store.suffix);
+            cvtool::file::change_filename(file, store.prefix, store.suffix);
 
         // 出力先ディレクトリ作成
-        if (!cvtool::utility::create_parent_directories(outfile))
+        if (!cvtool::file::create_parent_directories(outfile))
         {
-            cvtool::utility::print_error(
-                "Cannot create parent directory of '" + outfile + "'.");
+            cvtool::error::prints("Cannot create parent directory of '", outfile, "'.");
             return false;
         }
 
         cout << "OUTPUT : " << outfile << endl;
 
-        // 出力
-        if (!cv::imwrite(outfile, dest_img))
+        // ファイル書き出し
+        if (!cvtool::image::write(outfile, dest_img))
         {
-            cvtool::utility::print_error("Cannot write image file '" + outfile + "'.");
+            cvtool::error::prints("Cannot write image file '", outfile, "'.");
             return false;
         }
 
@@ -82,10 +82,10 @@ int main(int argc, char* argv[])
         argv,
         "files...",
         -1,
-        cvtool::utility::make_filename_prefix_program_arg(
+        cvtool::file::make_filename_prefix_program_arg(
             "file-prefix,P",
             store.prefix),
-        cvtool::utility::make_filename_suffix_program_arg(
+        cvtool::file::make_filename_suffix_program_arg(
             "file-suffix,S",
             store.suffix),
         cvtool::make_switch_program_arg(
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     }
     catch (const std::exception& ex)
     {
-        cvtool::utility::print_error(ex);
+        cvtool::error::print(ex);
         return 1;
     }
 
@@ -118,14 +118,22 @@ int main(int argc, char* argv[])
     // ファイルが1つも渡されなかった？
     if (program.parsed_positional_arg_count() <= 0)
     {
-        cvtool::utility::print_error("No input files.\nSet '--help' to print usage.");
+        cvtool::error::print("No input files.\nSet '--help' to print usage.");
         return 1;
     }
 
     // ファイルごとに処理
     bool result = true;
-    program.for_each_parsed_positional_args(
-        [&](const std::string& arg) { result &= execute(arg, store); });
+    try
+    {
+        program.for_each_parsed_positional_args(
+            [&](const std::string& arg) { result &= execute(arg, store); });
+    }
+    catch (const std::exception& ex)
+    {
+        cvtool::error::print(ex);
+        return 1;
+    }
 
     return result ? 0 : 1;
 }

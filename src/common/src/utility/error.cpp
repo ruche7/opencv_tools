@@ -6,26 +6,26 @@
 
 #include <iostream>
 
-namespace cvtool { namespace utility
+namespace cvtool { namespace error
 {
-    void print_error(const std::string& message)
+    void print(const std::string& message)
     {
-        print_error(std::cerr, message);
+        print(std::cerr, message);
     }
 
-    void print_error(std::ostream& s, const std::string& message)
+    void print(std::ostream& s, const std::string& message)
     {
         s << "ERROR: " << message << std::endl;
     }
 
-    void print_error(const std::exception& ex)
+    void print(const std::exception& ex)
     {
-        print_error(std::cerr, ex);
+        print(std::cerr, ex);
     }
 
-    void print_error(std::ostream& s, const std::exception& ex)
+    void print(std::ostream& s, const std::exception& ex)
     {
         auto msg = ex.what();
-        print_error(s, (msg == nullptr) ? "Unknown error." : msg);
+        print(s, (msg == nullptr) ? "Unknown error." : msg);
     }
 }}
