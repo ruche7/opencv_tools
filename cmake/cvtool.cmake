@@ -8,19 +8,12 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 include(common)
 
 #---------------------------------------
-# 定数定義
-#---------------------------------------
-
-# OpenCVライブラリバージョン既定値
-set(DEFAULT_OPENCV_VERSION "248")
-
-#---------------------------------------
 # OpenCVライブラリバージョンをチェックする。
 #---------------------------------------
 macro(check_opencv_version VERSION)
     # バージョンチェック用ソースをコンパイル＆実行
     try_run(
-        OPENCV_VERSION_CACHE
+        RUN_RES
         COMPILE_RES
         "${CMAKE_MODULE_PATH}/mod_src"
         "${CMAKE_MODULE_PATH}/mod_src/opencv_version.cpp")
@@ -28,15 +21,13 @@ macro(check_opencv_version VERSION)
     # エラーチェック
     if(NOT COMPILE_RES)
         message(FATAL_ERROR "Cannot check the OpenCV version. (compile error)")
-        set(OPENCV_VERSION_CACHE "${DEFAULT_OPENCV_VERSION}")
     endif()
-    if("${OPENCV_VERSION_CACHE}" STREQUAL "FAILED_TO_RUN")
+    if("${RUN_RES}" STREQUAL "FAILED_TO_RUN")
         message(FATAL_ERROR "Cannot check the OpenCV version. (runtime error)")
-        set(OPENCV_VERSION_CACHE "${DEFAULT_OPENCV_VERSION}")
     endif()
 
     # バージョン設定
-    set(${VERSION} "${OPENCV_VERSION_CACHE}")
+    set(${VERSION} "${RUN_RES}")
 endmacro()
 
 #---------------------------------------
